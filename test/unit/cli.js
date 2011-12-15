@@ -1,7 +1,8 @@
 var fs = require('fs'),
     path = require('path'),
     cli = require('./../../lib/cli'),
-    hint = require('./../../lib/hint');
+    hint = require('./../../lib/hint'),
+    Q = require('q');
 
 describe("cli", function () {
     beforeEach(function () {
@@ -10,7 +11,7 @@ describe("cli", function () {
         }
 
         spyOn(process, "exit");
-        spyOn(hint, "hint").andReturn([]);
+        spyOn(hint, "hint").andReturn(Q.ref([]));
         spyOn(process.stdout, "write");
     });
 
@@ -144,7 +145,7 @@ describe("cli", function () {
     });
 
     it("exits the process with a successful status code with no lint errors", function () {
-        var results = [];
+        var results = Q.ref([]);
 
         hint.hint.reset();
         hint.hint.andReturn(results);
@@ -156,7 +157,7 @@ describe("cli", function () {
     });
 
     it("exits the process with a failed status code when there are lint errors", function () {
-        var results = [{}, {}];
+        var results = Q.ref([{}, {}]);
 
         hint.hint.reset();
         hint.hint.andReturn(results);
@@ -168,7 +169,7 @@ describe("cli", function () {
     });
 
     it("listens for sdtout drain event if not flushed", function () {
-        var results = [{}, {}];
+        var results = Q.ref([{}, {}]);
 
         hint.hint.reset();
         hint.hint.andReturn(results);
@@ -179,7 +180,11 @@ describe("cli", function () {
 
         cli.interpret(["node", "hint", "file.js"]);
 
-        expect(process.stdout.on.argsForCall[0][0]).toBe("drain");
-        expect(process.exit).toHaveBeenCalledWith(1);
+        waits(500);
+
+        runs(function() {
+            expect(process.stdout.on.argsForCall[0][0]).toBe("drain");
+            expect(process.exit).toHaveBeenCalledWith(1);
+        });
     });
 });

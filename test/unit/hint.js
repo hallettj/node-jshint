@@ -63,15 +63,19 @@ describe("hint", function () {
 
         hint.hint(targets);
 
-        expect(fs.readFileSync.callCount).toEqual(2);
+        waits(100);
 
-        expect(fs.readFileSync.argsForCall[0])
-            .toContain(require('path').join(targets[0], "file2.js"));
+        runs(function() {
+            expect(fs.readFileSync.callCount).toEqual(2);
 
-        expect(fs.readFileSync.argsForCall[0]).toContain("utf-8");
+            expect(fs.readFileSync.argsForCall[0])
+                .toContain(require('path').join(targets[0], "file2.js"));
 
-        expect(fs.readFileSync.argsForCall[1]).toContain(targets[1]);
-        expect(fs.readFileSync.argsForCall[1]).toContain("utf-8");
+            expect(fs.readFileSync.argsForCall[0]).toContain("utf-8");
+
+            expect(fs.readFileSync.argsForCall[1]).toContain(targets[1]);
+            expect(fs.readFileSync.argsForCall[1]).toContain("utf-8");
+        });
     });
 
     it("passes custom config", function () {
@@ -123,8 +127,12 @@ describe("hint", function () {
 
         hint.hint(targets, null, null, ignore);
 
-        expect(fs.readFileSync.callCount).toBe(1);
-        expect(fs.readFileSync.mostRecentCall.args[0]).toBe("file2.js");
+        waits(100);
+
+        runs(function() {
+            expect(fs.readFileSync.callCount).toBe(1);
+            expect(fs.readFileSync.mostRecentCall.args[0]).toBe("file2.js");
+        });
     });
 
     it("ignores directories", function () {
